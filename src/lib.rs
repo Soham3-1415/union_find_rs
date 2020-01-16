@@ -99,9 +99,10 @@ impl<T> UnionFind<T> for DisjointSet<'_, T> {
 	}
 }
 
-impl<'a, T> Default for DisjointSet<'a, T> {
+impl<'a, T> Default for DisjointSet<'a, T>
+	where T: std::hash::Hash + std::cmp::Eq {
 	fn default() -> DisjointSet<'a, T> {
-		unimplemented!()
+		DisjointSet { ver: 0, map: HashMap::new(), set: Vec::new() }
 	}
 }
 
