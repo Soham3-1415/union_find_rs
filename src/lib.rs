@@ -1,13 +1,15 @@
-use std::{fmt, result};
-use std::collections::HashMap;
+use std::{cmp, fmt, hash, result};
+use std::collections::{HashMap, HashSet};
 use std::fmt::{Display, Formatter};
 use std::marker::PhantomData;
 
 #[cfg(test)]
 mod tests {
+	use super::{DisjointSet, UnionFind};
+
 	#[test]
-	fn it_works() {
-		assert_eq!(2 + 2, 4);
+	fn create_disjoint_set() {
+		let set = DisjointSet::from(b"This is a test.");
 	}
 }
 
@@ -17,6 +19,7 @@ type Result<T> = result::Result<T, UnionFindError>;
 pub enum UnionFindError {
 	ElementNotFound,
 	DuplicateElement,
+	ElementsAlreadyInSameSet,
 }
 
 impl Display for UnionFindError {
@@ -26,7 +29,8 @@ impl Display for UnionFindError {
 			"{}",
 			match self {
 				UnionFindError::ElementNotFound => "The provided element was not found.",
-				UnionFindError::DuplicateElement => "The provided element is already in the set.",
+				UnionFindError::DuplicateElement => "The provided element is already in a set.",
+				UnionFindError::ElementsAlreadyInSameSet => "The provided elements are already in the same set."
 			}
 		)
 	}
@@ -49,22 +53,22 @@ pub trait UnionFind<T> {
 	fn group(&self, elem: &T) -> Result<Vec<&T>>;
 	fn all_groups(&self) -> Result<Vec<Vec<&T>>>;
 	fn are_same(&self, elem_a: &T, elem_b: &T) -> Result<bool>;
-	fn size() -> usize;
+	fn size(&self) -> usize;
 }
 
-pub struct DisjointSet<T> {
+pub struct DisjointSet<'a, T> {
 	ver: u32,
-	map: HashMap<T, usize>,
+	map: HashMap<&'a T, usize>,
 	set: Vec<usize>,
 }
 
-impl<T> fmt::Debug for DisjointSet<T> {
+impl<T> fmt::Debug for DisjointSet<'_, T> {
 	fn fmt(&self, f: &mut Formatter<'_>) -> result::Result<(), fmt::Error> {
 		unimplemented!()
 	}
 }
 
-impl<T> UnionFind<T> for DisjointSet<T> {
+impl<T> UnionFind<T> for DisjointSet<'_, T> {
 	fn add(&self, elem: &T) -> Result<()> {
 		unimplemented!()
 	}
@@ -77,14 +81,6 @@ impl<T> UnionFind<T> for DisjointSet<T> {
 		unimplemented!()
 	}
 
-	fn are_same(&self, elem_a: &T, elem_b: &T) -> Result<bool> {
-		unimplemented!()
-	}
-
-	fn size() -> usize {
-		unimplemented!()
-	}
-
 	fn group(&self, elem: &T) -> Result<Vec<&T>> {
 		unimplemented!()
 	}
@@ -92,16 +88,42 @@ impl<T> UnionFind<T> for DisjointSet<T> {
 	fn all_groups(&self) -> Result<Vec<Vec<&T>>> {
 		unimplemented!()
 	}
-}
 
-impl<T> Default for DisjointSet<T> {
-	fn default() -> DisjointSet<T> {
+	fn are_same(&self, elem_a: &T, elem_b: &T) -> Result<bool> {
+		unimplemented!()
+	}
+
+	fn size(&self) -> usize {
 		unimplemented!()
 	}
 }
 
-impl<T> DisjointSet<T> {
-	pub fn from(source: &[T]) -> DisjointSet<T> {
+impl<'a, T> Default for DisjointSet<'a, T> {
+	fn default() -> DisjointSet<'a, T> {
 		unimplemented!()
+	}
+}
+
+impl<T> DisjointSet<'_, T>
+	where T: hash::Hash + cmp::Eq {
+	pub fn from(source: &[T]) -> DisjointSet<T> {
+		let mut map = HashMap::new();
+		let mut set = Vec::new();
+
+		source.iter()
+			.for_each(
+				|elem| {
+					map.entry(elem)
+						.or_insert_with(
+							|| {
+								let len = set.len();
+								set.push(len);
+								len
+							}
+						);
+				}
+			);
+
+		DisjointSet { ver: 0, map, set }
 	}
 }
