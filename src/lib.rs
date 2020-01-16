@@ -17,6 +17,7 @@ type Result<T> = result::Result<T, UnionFindError>;
 pub enum UnionFindError {
 	ElementNotFound,
 	DuplicateElement,
+	ElementsAlreadyInSameSet,
 }
 
 impl Display for UnionFindError {
@@ -26,7 +27,8 @@ impl Display for UnionFindError {
 			"{}",
 			match self {
 				UnionFindError::ElementNotFound => "The provided element was not found.",
-				UnionFindError::DuplicateElement => "The provided element is already in the set.",
+				UnionFindError::DuplicateElement => "The provided element is already in a set.",
+				UnionFindError::ElementsAlreadyInSameSet => "The provided elements are already in the same set."
 			}
 		)
 	}
