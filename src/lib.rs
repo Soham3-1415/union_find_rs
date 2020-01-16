@@ -49,7 +49,7 @@ pub trait UnionFind<T> {
 	fn group(&self, elem: &T) -> Result<Vec<&T>>;
 	fn all_groups(&self) -> Result<Vec<Vec<&T>>>;
 	fn are_same(&self, elem_a: &T, elem_b: &T) -> Result<bool>;
-	fn size() -> usize;
+	fn size(&self) -> usize;
 }
 
 pub struct DisjointSet<T> {
@@ -81,7 +81,7 @@ impl<T> UnionFind<T> for DisjointSet<T> {
 		unimplemented!()
 	}
 
-	fn size() -> usize {
+	fn size(&self) -> usize {
 		unimplemented!()
 	}
 
