@@ -1,5 +1,5 @@
-use std::{fmt, result};
-use std::collections::HashMap;
+use std::{cmp, fmt, hash, result};
+use std::collections::{HashMap, HashSet};
 use std::fmt::{Display, Formatter};
 use std::marker::PhantomData;
 
@@ -9,7 +9,7 @@ mod tests {
 
 	#[test]
 	fn create_disjoint_set() {
-		DisjointSet::from(b"This is a test.");
+		let set = DisjointSet::from(b"This is a test.");
 	}
 }
 
@@ -56,19 +56,19 @@ pub trait UnionFind<T> {
 	fn size(&self) -> usize;
 }
 
-pub struct DisjointSet<T> {
+pub struct DisjointSet<'a, T> {
 	ver: u32,
-	map: HashMap<T, usize>,
+	map: HashMap<&'a T, usize>,
 	set: Vec<usize>,
 }
 
-impl<T> fmt::Debug for DisjointSet<T> {
+impl<T> fmt::Debug for DisjointSet<'_, T> {
 	fn fmt(&self, f: &mut Formatter<'_>) -> result::Result<(), fmt::Error> {
 		unimplemented!()
 	}
 }
 
-impl<T> UnionFind<T> for DisjointSet<T> {
+impl<T> UnionFind<T> for DisjointSet<'_, T> {
 	fn add(&self, elem: &T) -> Result<()> {
 		unimplemented!()
 	}
@@ -81,14 +81,6 @@ impl<T> UnionFind<T> for DisjointSet<T> {
 		unimplemented!()
 	}
 
-	fn are_same(&self, elem_a: &T, elem_b: &T) -> Result<bool> {
-		unimplemented!()
-	}
-
-	fn size(&self) -> usize {
-		unimplemented!()
-	}
-
 	fn group(&self, elem: &T) -> Result<Vec<&T>> {
 		unimplemented!()
 	}
@@ -96,16 +88,42 @@ impl<T> UnionFind<T> for DisjointSet<T> {
 	fn all_groups(&self) -> Result<Vec<Vec<&T>>> {
 		unimplemented!()
 	}
-}
 
-impl<T> Default for DisjointSet<T> {
-	fn default() -> DisjointSet<T> {
+	fn are_same(&self, elem_a: &T, elem_b: &T) -> Result<bool> {
+		unimplemented!()
+	}
+
+	fn size(&self) -> usize {
 		unimplemented!()
 	}
 }
 
-impl<T> DisjointSet<T> {
-	pub fn from(source: &[T]) -> DisjointSet<T> {
+impl<'a, T> Default for DisjointSet<'a, T> {
+	fn default() -> DisjointSet<'a, T> {
 		unimplemented!()
+	}
+}
+
+impl<T> DisjointSet<'_, T>
+	where T: hash::Hash + cmp::Eq {
+	pub fn from(source: &[T]) -> DisjointSet<T> {
+		let mut map = HashMap::new();
+		let mut set = Vec::new();
+
+		source.iter()
+			.for_each(
+				|elem| {
+					map.entry(elem)
+						.or_insert_with(
+							|| {
+								let len = set.len();
+								set.push(len);
+								len
+							}
+						);
+				}
+			);
+
+		DisjointSet { ver: 0, map, set }
 	}
 }
