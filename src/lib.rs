@@ -8,8 +8,9 @@ mod tests {
 	use super::{DisjointSet, UnionFind};
 
 	#[test]
-	fn create_disjoint_set() {
-		let set = DisjointSet::from(b"This is a test.");
+	fn create_disjoint_sets() {
+		DisjointSet::from(b"This is a test.");
+		DisjointSet::<u8>::default();
 	}
 }
 
