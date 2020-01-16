@@ -5,9 +5,11 @@ use std::marker::PhantomData;
 
 #[cfg(test)]
 mod tests {
+	use super::{DisjointSet, UnionFind};
+
 	#[test]
-	fn it_works() {
-		assert_eq!(2 + 2, 4);
+	fn create_disjoint_set() {
+		DisjointSet::from(b"This is a test.");
 	}
 }
 
