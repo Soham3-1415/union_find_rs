@@ -270,6 +270,7 @@ impl<'a, T: 'a> UnionFind<'a, T> for DisjointSet<'a, T>
 			.map_err(|_| DisjointSetError::DuplicateElement)?;
 
 		set.push(set.len());
+		self.subset_count += 1;
 
 		Ok(())
 	}
