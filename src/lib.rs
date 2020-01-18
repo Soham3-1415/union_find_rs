@@ -279,7 +279,13 @@ impl<'a, T: 'a> UnionFind<'a, T> for DisjointSet<'a, T>
 		let a_i = self.index(elem_a)?;
 		let b_i = self.index(elem_b)?;
 
-		self.set[b_i] = self.find_internal(a_i);
+		let new_parent = self.find_internal(a_i, None);
+		let original_parent = self.find_internal(b_i, Some(new_parent));
+
+		if original_parent != new_parent {
+			self.set[original_parent] = new_parent;
+			self.subset_count -= 1;
+		}
 
 		Ok(())
 	}
@@ -287,7 +293,7 @@ impl<'a, T: 'a> UnionFind<'a, T> for DisjointSet<'a, T>
 	// TODO: Examine usefulness
 //	fn find(&mut self, elem: &T) -> Result<SubsetTicket<DisjointSet<'a, T>>> {
 //		let id = self.index(elem)?;
-//		let id = self.find_internal(id);
+//		let id = self.find_internal(id, None);
 //
 //		Ok(SubsetTicket { ver: self.ver, id, set: self as *const DisjointSet<T> })
 //	}
@@ -337,13 +343,13 @@ impl<'a, T> iter::FromIterator<&'a T> for DisjointSet<'a, T>
 
 impl<T> DisjointSet<'_, T>
 	where T: hash::Hash + Eq {
-	fn find_internal(&mut self, elem: usize) -> usize {
+	fn find_internal(&mut self, elem: usize, elem_future_parent: Option<usize>) -> usize {
 		if self.set[elem] == elem {
 			return elem;
 		}
 
-		let result = self.find_internal(self.set[elem]);
-		self.set[elem] = result; // path compression
+		let result = self.find_internal(self.set[elem], elem_future_parent);
+		self.set[elem] = elem_future_parent.unwrap_or(result); // path compression (possibly to a new parent)
 		result
 	}
 
