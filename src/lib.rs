@@ -251,8 +251,15 @@ impl<'a, T: 'a> UnionFind<'a, T> for DisjointSet<'a, T>
 	type UnionFindImplementation = Self;
 	type UnionFindError = DisjointSetError;
 
-	fn define(&mut self, elem: &T) -> Result<()> {
-		unimplemented!()
+	fn define(&mut self, elem: &'a T) -> Result<()> {
+		let mut set = &mut self.set;
+
+		self.map.insert_no_overwrite(elem, set.len())
+			.map_err(|_| DisjointSetError::DuplicateElement)?;
+
+		set.push(set.len());
+
+		Ok(())
 	}
 
 	fn union(&mut self, elem_a: &T, elem_b: &T) -> Result<()> {
