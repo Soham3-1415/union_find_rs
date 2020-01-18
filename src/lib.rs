@@ -1,5 +1,6 @@
 use std::{collections::HashSet, error, fmt, hash, iter, result};
 
+//TODO: Use a bidirectional hash map that is stable
 use bimap::BiHashMap;
 
 #[cfg(test)]
