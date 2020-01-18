@@ -240,7 +240,6 @@ pub trait UnionFind<'a, T: 'a>
 
 pub struct DisjointSet<'a, T>
 	where T: hash::Hash + Eq {
-	ver: usize,
 	map: BiHashMap<&'a T, usize>,
 	set: Vec<usize>,
 	subset_count: usize,
@@ -299,7 +298,7 @@ impl<'a, T: 'a> UnionFind<'a, T> for DisjointSet<'a, T>
 impl<'a, T> Default for DisjointSet<'_, T>
 	where T: hash::Hash + Eq {
 	fn default() -> Self {
-		DisjointSet { ver: 0, map: BiHashMap::new(), set: Vec::new(), subset_count: 0 }
+		DisjointSet { map: BiHashMap::new(), set: Vec::new(), subset_count: 0 }
 	}
 }
 
@@ -318,7 +317,7 @@ impl<'a, T> iter::FromIterator<&'a T> for DisjointSet<'a, T>
 			}
 		);
 
-		DisjointSet { ver: 0, set, subset_count: map.len(), map }
+		DisjointSet { set, subset_count: map.len(), map }
 	}
 }
 
