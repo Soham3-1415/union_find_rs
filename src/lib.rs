@@ -229,12 +229,12 @@ pub trait UnionFind<'a, T: 'a>
 	type UnionFindImplementation: UnionFind<'a, T>;
 	type UnionFindError: error::Error;
 
-	fn define(&mut self, elem: &T) -> result::Result<(), Self::UnionFindError>;
-	fn union(&mut self, elem_a: &T, elem_b: &T) -> result::Result<(), Self::UnionFindError>;
-	//	fn find(&mut self, elem: &T) -> result::Result<SubsetTicket<Self::UnionFindImplementation>, Self::UnionFindError>;
-	fn subset_containing(&mut self, elem: &T) -> result::Result<HashSet<&T>, Self::UnionFindError>;
+	fn define(&mut self, elem: &'a T) -> result::Result<(), Self::UnionFindError>;
+	fn union(&mut self, elem_a: &'a T, elem_b: &'a T) -> result::Result<(), Self::UnionFindError>;
+	//	fn find(&mut self, elem: &'a T) -> result::Result<SubsetTicket<Self::UnionFindImplementation>, Self::UnionFindError>;
+	fn subset_containing(&mut self, elem: &'a T) -> result::Result<HashSet<&T>, Self::UnionFindError>;
 	fn all_subsets(&mut self) -> Vec<HashSet<&T>>;
-	fn same_subset(&mut self, elem_a: &T, elem_b: &T) -> result::Result<bool, Self::UnionFindError>;
+	fn same_subset(&mut self, elem_a: &'a T, elem_b: &'a T) -> result::Result<bool, Self::UnionFindError>;
 	fn subset_count(&self) -> usize;
 }
 
