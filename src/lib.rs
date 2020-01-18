@@ -263,7 +263,12 @@ impl<'a, T: 'a> UnionFind<'a, T> for DisjointSet<'a, T>
 	}
 
 	fn union(&mut self, elem_a: &T, elem_b: &T) -> Result<()> {
-		unimplemented!()
+		let a_i = self.index(elem_a)?;
+		let b_i = self.index(elem_b)?;
+
+		self.set[b_i] = self.find_internal(a_i);
+
+		Ok(())
 	}
 
 	// TODO: Examine usefulness
