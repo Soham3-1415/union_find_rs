@@ -31,10 +31,23 @@ mod tests {
 		let mut set = DisjointSet::from_iter(b"This is a test.");
 		assert_eq!(9, set.subset_count());
 
+		set.define(&b'P').unwrap();
+		assert_eq!(10, set.subset_count());
+
+		set.define(&b'h').unwrap_err();
+		assert_eq!(10, set.subset_count());
+
 		set.union(&b'h', &b'i').unwrap();
+		assert_eq!(9, set.subset_count());
+
 		set.union(&b'T', &b'i').unwrap();
+		assert_eq!(8, set.subset_count());
+
 		set.union(&b'h', &b'T').unwrap();
-		assert_eq!(7, set.subset_count());
+		assert_eq!(8, set.subset_count());
+
+		set.union(&b'Q', &b'h').unwrap_err();
+		assert_eq!(8, set.subset_count());
 	}
 
 	// TODO: Examine usefulness
