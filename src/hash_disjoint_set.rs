@@ -23,7 +23,6 @@ impl<'a, T: 'a> UnionFind<'a, T> for HashDisjointSet<'a, T>
 	where T: hash::Hash + Eq {
 	type UnionFindImplementation = Self;
 
-	// TODO: define conditions to invalidate a ticket
 	fn define(&mut self, elem: &'a T) -> Result<()> {
 		let set = &mut self.set;
 
@@ -32,11 +31,11 @@ impl<'a, T: 'a> UnionFind<'a, T> for HashDisjointSet<'a, T>
 
 		set.push(Unit { size: 1, parent: set.len() });
 		self.subset_count += 1;
+		self.ver += 1;
 
 		Ok(())
 	}
 
-	// TODO: define conditions to invalidate a ticket
 	fn union(&mut self, elem_a: &T, elem_b: &T) -> Result<()> {
 		let a_i = self.index(elem_a)?;
 		let b_i = self.index(elem_b)?;
