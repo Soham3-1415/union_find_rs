@@ -1,15 +1,13 @@
 use std::{hash, iter, mem};
 use std::collections::{HashMap, HashSet};
-
-//TODO: Use a bidirectional hash map that is stable
-use bimap::BiHashMap;
+use std::collections::hash_map::Entry;
 
 use crate::{Result, SubsetTicket, UnionFind, UnionFindError};
 
 pub struct HashDisjointSet<'a, T>
 	where T: hash::Hash + Eq {
 	ver: usize,
-	map: BiHashMap<&'a T, usize>,
+	map: HashMap<&'a T, usize>,
 	set: Vec<Unit>,
 	subset_count: usize,
 }
@@ -26,8 +24,12 @@ impl<'a, T: 'a> UnionFind<'a, T> for HashDisjointSet<'a, T>
 	fn define(&mut self, elem: &'a T) -> Result<()> {
 		let set = &mut self.set;
 
-		self.map.insert_no_overwrite(elem, set.len())
-			.map_err(|_| UnionFindError::DuplicateElement)?;
+		if let Entry::Vacant(entry) = self.map.entry(elem) {
+			entry.insert(set.len());
+			Ok(())
+		} else {
+			Err(UnionFindError::DuplicateElement)
+		}?;
 
 		set.push(Unit { size: 1, parent: set.len() });
 		self.subset_count += 1;
@@ -126,7 +128,7 @@ impl<'a, T: 'a> UnionFind<'a, T> for HashDisjointSet<'a, T>
 impl<'a, T> Default for HashDisjointSet<'_, T>
 	where T: hash::Hash + Eq {
 	fn default() -> Self {
-		HashDisjointSet { ver: 0, map: BiHashMap::new(), set: Vec::new(), subset_count: 0 }
+		HashDisjointSet { ver: 0, map: HashMap::new(), set: Vec::new(), subset_count: 0 }
 	}
 }
 
@@ -134,14 +136,19 @@ impl<'a, T> iter::FromIterator<&'a T> for HashDisjointSet<'a, T>
 	where T: hash::Hash + Eq {
 	fn from_iter<I>(iter: I) -> Self
 		where I: IntoIterator<Item=&'a T> {
-		let mut map = BiHashMap::new();
+		let mut map = HashMap::new();
 		let mut set = Vec::new();
 
 		iter.into_iter().for_each(
 			|elem| {
-				if let Ok(()) = map.insert_no_overwrite(elem, set.len()) {
-					set.push(Unit { size: 1, parent: set.len() });
-				}
+				map.entry(elem)
+					.or_insert_with(
+						|| {
+							let len = set.len();
+							set.push(Unit { size: 1, parent: len });
+							len
+						}
+					);
 			}
 		);
 
@@ -162,6 +169,6 @@ impl<T> HashDisjointSet<'_, T>
 	}
 
 	fn index(&self, elem: &T) -> Result<usize> {
-		Ok(*self.map.get_by_left(&elem).ok_or(UnionFindError::ElementNotDefined)?)
+		Ok(*self.map.get(&elem).ok_or(UnionFindError::ElementNotDefined)?)
 	}
 }
