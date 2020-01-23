@@ -233,11 +233,9 @@ pub type Result<T> = result::Result<T, UnionFindError>;
 
 pub trait UnionFind<'a, T: 'a>
 	where Self: iter::FromIterator<&'a T> {
-	type UnionFindImplementation: UnionFind<'a, T>;
-
 	fn define(&mut self, elem: &'a T) -> Result<()>;
 	fn union(&mut self, elem_a: &'a T, elem_b: &'a T) -> Result<()>;
-	fn find(&mut self, elem: &'a T) -> Result<SubsetTicket<Self::UnionFindImplementation>>;
+	fn find(&mut self, elem: &'a T) -> Result<SubsetTicket>;
 	fn subset_containing(&mut self, elem: &'a T) -> Result<HashSet<&T>>;
 	fn all_subsets(&mut self) -> Vec<HashSet<&T>>;
 	fn same_subset(&mut self, elem_a: &'a T, elem_b: &'a T) -> Result<bool>;
@@ -266,31 +264,23 @@ impl fmt::Display for UnionFindError {
 
 impl std::error::Error for UnionFindError {}
 
-#[derive(Eq)]
-pub struct SubsetTicket<T> {
+#[derive(Eq, PartialEq)]
+pub struct SubsetTicket {
 	id: usize,
 	ver: usize,
-	set: *const T,
+	set_id: usize,
 }
 
-impl<T> fmt::Debug for SubsetTicket<T> {
+impl fmt::Debug for SubsetTicket {
 	fn fmt(&self, f: &mut fmt::Formatter<'_>) -> result::Result<(), fmt::Error> {
-		write!(f, "id: {}, version: {}", self.id, self.ver)
+		write!(f, "id: {}, version: {}, set: {:?}", self.id, self.ver, self.set_id)
 	}
 }
 
-impl<T> PartialEq for SubsetTicket<T> {
-	fn eq(&self, other: &Self) -> bool {
-		self.id == other.id &&
-			self.ver == other.ver &&
-			self.set as *const _ == other.set as *const _
-	}
-}
-
-impl<T> hash::Hash for SubsetTicket<T> {
+impl hash::Hash for SubsetTicket {
 	fn hash<H: hash::Hasher>(&self, state: &mut H) {
 		self.id.hash(state);
 		self.ver.hash(state);
-		self.set.hash(state);
+		self.set_id.hash(state);
 	}
 }

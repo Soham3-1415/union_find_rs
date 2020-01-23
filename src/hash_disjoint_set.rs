@@ -1,8 +1,11 @@
 use std::{hash, iter, mem};
 use std::collections::{HashMap, HashSet};
 use std::collections::hash_map::Entry;
+use std::sync::atomic::{AtomicUsize, Ordering};
 
 use crate::{Result, SubsetTicket, UnionFind, UnionFindError};
+
+static SET_ID: AtomicUsize = AtomicUsize::new(0);
 
 pub struct HashDisjointSet<'a, T>
 	where T: hash::Hash + Eq {
@@ -10,6 +13,7 @@ pub struct HashDisjointSet<'a, T>
 	map: HashMap<&'a T, usize>,
 	set: Vec<Unit>,
 	subset_count: usize,
+	set_id: usize,
 }
 
 struct Unit {
@@ -19,8 +23,6 @@ struct Unit {
 
 impl<'a, T: 'a> UnionFind<'a, T> for HashDisjointSet<'a, T>
 	where T: hash::Hash + Eq {
-	type UnionFindImplementation = Self;
-
 	fn define(&mut self, elem: &'a T) -> Result<()> {
 		let set = &mut self.set;
 
@@ -60,11 +62,11 @@ impl<'a, T: 'a> UnionFind<'a, T> for HashDisjointSet<'a, T>
 		Ok(())
 	}
 
-	fn find(&mut self, elem: &T) -> Result<SubsetTicket<Self>> {
+	fn find(&mut self, elem: &T) -> Result<SubsetTicket> {
 		let i = self.index(elem)?;
 		let root = Self::find_internal(&mut self.set, i);
 
-		Ok(SubsetTicket { ver: self.ver, id: root, set: self as *const Self })
+		Ok(SubsetTicket { ver: self.ver, id: root, set_id: self.set_id })
 	}
 
 	fn subset_containing(&mut self, elem: &T) -> Result<HashSet<&T>> {
@@ -128,7 +130,9 @@ impl<'a, T: 'a> UnionFind<'a, T> for HashDisjointSet<'a, T>
 impl<'a, T> Default for HashDisjointSet<'_, T>
 	where T: hash::Hash + Eq {
 	fn default() -> Self {
-		HashDisjointSet { ver: 0, map: HashMap::new(), set: Vec::new(), subset_count: 0 }
+		let disjoint_set = HashDisjointSet { ver: 0, map: HashMap::new(), set: Vec::new(), subset_count: 0, set_id: SET_ID.load(Ordering::SeqCst) };
+		SET_ID.fetch_add(1, Ordering::SeqCst);
+		disjoint_set
 	}
 }
 
@@ -152,7 +156,9 @@ impl<'a, T> iter::FromIterator<&'a T> for HashDisjointSet<'a, T>
 			}
 		);
 
-		HashDisjointSet { ver: 0, set, subset_count: map.len(), map }
+		let disjoint_set = HashDisjointSet { ver: 0, set, subset_count: map.len(), map, set_id: SET_ID.load(Ordering::SeqCst) };
+		SET_ID.fetch_add(1, Ordering::SeqCst);
+		disjoint_set
 	}
 }
 
