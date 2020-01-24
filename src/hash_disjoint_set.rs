@@ -1,14 +1,16 @@
-use std::{hash, iter, mem};
-use std::collections::{HashMap, HashSet};
 use std::collections::hash_map::Entry;
+use std::collections::{HashMap, HashSet};
 use std::sync::atomic::{AtomicUsize, Ordering};
+use std::{hash, iter, mem};
 
 use crate::{Result, SubsetTicket, UnionFind, UnionFindError};
 
 static SET_ID: AtomicUsize = AtomicUsize::new(0);
 
 pub struct HashDisjointSet<'a, T>
-	where T: hash::Hash + Eq {
+where
+	T: hash::Hash + Eq,
+{
 	ver: usize,
 	map: HashMap<&'a T, usize>,
 	set: Vec<Unit>,
@@ -22,7 +24,9 @@ struct Unit {
 }
 
 impl<'a, T: 'a> UnionFind<'a, T> for HashDisjointSet<'a, T>
-	where T: hash::Hash + Eq {
+where
+	T: hash::Hash + Eq,
+{
 	fn define(&mut self, elem: &'a T) -> Result<()> {
 		let set = &mut self.set;
 
@@ -33,7 +37,10 @@ impl<'a, T: 'a> UnionFind<'a, T> for HashDisjointSet<'a, T>
 			Err(UnionFindError::DuplicateElement)
 		}?;
 
-		set.push(Unit { size: 1, parent: set.len() });
+		set.push(Unit {
+			size: 1,
+			parent: set.len(),
+		});
 		self.subset_count += 1;
 		self.ver += 1;
 
@@ -66,7 +73,11 @@ impl<'a, T: 'a> UnionFind<'a, T> for HashDisjointSet<'a, T>
 		let i = self.index(elem)?;
 		let root = Self::find_internal(&mut self.set, i);
 
-		Ok(SubsetTicket { ver: self.ver, id: root, set_id: self.set_id })
+		Ok(SubsetTicket {
+			ver: self.ver,
+			id: root,
+			set_id: self.set_id,
+		})
 	}
 
 	fn subset_containing(&mut self, elem: &T) -> Result<HashSet<&T>> {
@@ -76,9 +87,12 @@ impl<'a, T: 'a> UnionFind<'a, T> for HashDisjointSet<'a, T>
 		let mut subset = HashSet::with_capacity(avg_set_size);
 
 		let set = &mut self.set;
-		self.map.iter()
+		self.map
+			.iter()
 			.filter(|(_, &i)| root == Self::find_internal(set, i))
-			.for_each(|(&elem, _)| { subset.insert(elem); });
+			.for_each(|(&elem, _)| {
+				subset.insert(elem);
+			});
 
 		Ok(subset)
 	}
@@ -89,19 +103,14 @@ impl<'a, T: 'a> UnionFind<'a, T> for HashDisjointSet<'a, T>
 		let mut subsets = Vec::with_capacity(self.subset_count);
 
 		let set = &mut self.set;
-		self.map.iter()
-			.for_each(
-				|(&elem, &i)| {
-					let root = Self::find_internal(set, i);
-					let entry = subset_map.entry(root).or_insert_with(
-						|| {
-							subsets.push(HashSet::with_capacity(avg_set_size));
-							subsets.len() - 1
-						}
-					);
-					subsets[*entry].insert(elem);
-				}
-			);
+		self.map.iter().for_each(|(&elem, &i)| {
+			let root = Self::find_internal(set, i);
+			let entry = subset_map.entry(root).or_insert_with(|| {
+				subsets.push(HashSet::with_capacity(avg_set_size));
+				subsets.len() - 1
+			});
+			subsets[*entry].insert(elem);
+		});
 
 		subsets
 	}
@@ -128,42 +137,60 @@ impl<'a, T: 'a> UnionFind<'a, T> for HashDisjointSet<'a, T>
 }
 
 impl<'a, T> Default for HashDisjointSet<'_, T>
-	where T: hash::Hash + Eq {
+where
+	T: hash::Hash + Eq,
+{
 	fn default() -> Self {
-		let disjoint_set = HashDisjointSet { ver: 0, map: HashMap::new(), set: Vec::new(), subset_count: 0, set_id: SET_ID.load(Ordering::SeqCst) };
+		let disjoint_set = HashDisjointSet {
+			ver: 0,
+			map: HashMap::new(),
+			set: Vec::new(),
+			subset_count: 0,
+			set_id: SET_ID.load(Ordering::SeqCst),
+		};
 		SET_ID.fetch_add(1, Ordering::SeqCst);
 		disjoint_set
 	}
 }
 
 impl<'a, T> iter::FromIterator<&'a T> for HashDisjointSet<'a, T>
-	where T: hash::Hash + Eq {
+where
+	T: hash::Hash + Eq,
+{
 	fn from_iter<I>(iter: I) -> Self
-		where I: IntoIterator<Item=&'a T> {
+	where
+		I: IntoIterator<Item = &'a T>,
+	{
 		let mut map = HashMap::new();
 		let mut set = Vec::new();
 
-		iter.into_iter().for_each(
-			|elem| {
-				map.entry(elem)
-					.or_insert_with(
-						|| {
-							let len = set.len();
-							set.push(Unit { size: 1, parent: len });
-							len
-						}
-					);
-			}
-		);
+		iter.into_iter().for_each(|elem| {
+			map.entry(elem).or_insert_with(|| {
+				let len = set.len();
+				set.push(Unit {
+					size: 1,
+					parent: len,
+				});
+				len
+			});
+		});
 
-		let disjoint_set = HashDisjointSet { ver: 0, set, subset_count: map.len(), map, set_id: SET_ID.load(Ordering::SeqCst) };
+		let disjoint_set = HashDisjointSet {
+			ver: 0,
+			set,
+			subset_count: map.len(),
+			map,
+			set_id: SET_ID.load(Ordering::SeqCst),
+		};
 		SET_ID.fetch_add(1, Ordering::SeqCst);
 		disjoint_set
 	}
 }
 
 impl<T> HashDisjointSet<'_, T>
-	where T: hash::Hash + Eq {
+where
+	T: hash::Hash + Eq,
+{
 	fn find_internal(set: &mut Vec<Unit>, elem: usize) -> usize {
 		let mut elem = elem;
 		while set[elem].parent != elem {
@@ -175,6 +202,9 @@ impl<T> HashDisjointSet<'_, T>
 	}
 
 	fn index(&self, elem: &T) -> Result<usize> {
-		Ok(*self.map.get(&elem).ok_or(UnionFindError::ElementNotDefined)?)
+		Ok(*self
+			.map
+			.get(&elem)
+			.ok_or(UnionFindError::ElementNotDefined)?)
 	}
 }

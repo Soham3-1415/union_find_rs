@@ -1,7 +1,7 @@
 use std::iter::FromIterator;
 
-use union_find::{SubsetTicket, UnionFind, UnionFindError};
 use union_find::hash_disjoint_set::HashDisjointSet;
+use union_find::{SubsetTicket, UnionFind, UnionFindError};
 
 #[test]
 fn ticket_from_moved_set() {

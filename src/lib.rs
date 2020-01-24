@@ -1,5 +1,5 @@
-use std::{fmt, hash, iter, result};
 use std::collections::HashSet;
+use std::{fmt, hash, iter, result};
 
 pub mod hash_disjoint_set;
 
@@ -8,8 +8,8 @@ mod tests {
 	use std::collections::HashSet;
 	use std::iter::FromIterator;
 
-	use crate::{UnionFind, UnionFindError};
 	use crate::hash_disjoint_set::HashDisjointSet;
+	use crate::{UnionFind, UnionFindError};
 
 	#[test]
 	fn create() {
@@ -72,7 +72,10 @@ mod tests {
 		set.union(&b'Q', &b'h').unwrap_err();
 		assert_eq!(3, set.subset_size(&b'h').unwrap());
 
-		assert_eq!(Err(UnionFindError::ElementNotDefined), set.subset_size(&b'Q'));
+		assert_eq!(
+			Err(UnionFindError::ElementNotDefined),
+			set.subset_size(&b'Q')
+		);
 	}
 
 	#[test]
@@ -85,10 +88,12 @@ mod tests {
 		let ticket3 = set.find(&b'T').unwrap();
 		assert_ne!(ticket1, ticket2);
 		assert_eq!(ticket1, ticket3);
-		assert_ne!(ticket1,
-				   HashDisjointSet::from_iter(b"This is a test.")
-					   .find(&b'T')
-					   .unwrap()); // group set must be different
+		assert_ne!(
+			ticket1,
+			HashDisjointSet::from_iter(b"This is a test.")
+				.find(&b'T')
+				.unwrap()
+		); // group set must be different
 
 		// union
 		set.union(&b'T', &b't').unwrap();
@@ -119,10 +124,22 @@ mod tests {
 
 		assert!(!set.same_subset(&b'.', &b'T').unwrap());
 		assert!(set.same_subset(&b'T', &b'T').unwrap());
-		assert_eq!(Err(UnionFindError::ElementNotDefined), set.same_subset(&b'A', &b'T'));
-		assert_eq!(Err(UnionFindError::ElementNotDefined), set.same_subset(&b'T', &b'A'));
-		assert_eq!(Err(UnionFindError::ElementNotDefined), set.same_subset(&b'A', &b'Q'));
-		assert_eq!(Err(UnionFindError::ElementNotDefined), set.same_subset(&b'A', &b'A'));
+		assert_eq!(
+			Err(UnionFindError::ElementNotDefined),
+			set.same_subset(&b'A', &b'T')
+		);
+		assert_eq!(
+			Err(UnionFindError::ElementNotDefined),
+			set.same_subset(&b'T', &b'A')
+		);
+		assert_eq!(
+			Err(UnionFindError::ElementNotDefined),
+			set.same_subset(&b'A', &b'Q')
+		);
+		assert_eq!(
+			Err(UnionFindError::ElementNotDefined),
+			set.same_subset(&b'A', &b'A')
+		);
 
 		set.union(&b'T', &b'.').unwrap();
 		set.define(&b'S').unwrap();
@@ -132,30 +149,66 @@ mod tests {
 		assert!(!set.same_subset(&b'h', &b'T').unwrap());
 		assert!(set.same_subset(&b'.', &b'S').unwrap());
 		assert!(set.same_subset(&b'T', &b'T').unwrap());
-		assert_eq!(Err(UnionFindError::ElementNotDefined), set.same_subset(&b'A', &b'T'));
-		assert_eq!(Err(UnionFindError::ElementNotDefined), set.same_subset(&b'T', &b'A'));
-		assert_eq!(Err(UnionFindError::ElementNotDefined), set.same_subset(&b'A', &b'Q'));
-		assert_eq!(Err(UnionFindError::ElementNotDefined), set.same_subset(&b'A', &b'A'));
+		assert_eq!(
+			Err(UnionFindError::ElementNotDefined),
+			set.same_subset(&b'A', &b'T')
+		);
+		assert_eq!(
+			Err(UnionFindError::ElementNotDefined),
+			set.same_subset(&b'T', &b'A')
+		);
+		assert_eq!(
+			Err(UnionFindError::ElementNotDefined),
+			set.same_subset(&b'A', &b'Q')
+		);
+		assert_eq!(
+			Err(UnionFindError::ElementNotDefined),
+			set.same_subset(&b'A', &b'A')
+		);
 	}
 
 	#[test]
 	fn union() {
 		let mut set = HashDisjointSet::from_iter(b"This is a test.");
 
-		assert_eq!(Err(UnionFindError::ElementNotDefined), set.union(&b't', &b'Q'));
-		assert_eq!(Err(UnionFindError::ElementNotDefined), set.union(&b'Q', &b't'));
-		assert_eq!(Err(UnionFindError::ElementNotDefined), set.union(&b'Z', &b'Q'));
-		assert_eq!(Err(UnionFindError::ElementNotDefined), set.union(&b'Q', &b'Q'));
+		assert_eq!(
+			Err(UnionFindError::ElementNotDefined),
+			set.union(&b't', &b'Q')
+		);
+		assert_eq!(
+			Err(UnionFindError::ElementNotDefined),
+			set.union(&b'Q', &b't')
+		);
+		assert_eq!(
+			Err(UnionFindError::ElementNotDefined),
+			set.union(&b'Z', &b'Q')
+		);
+		assert_eq!(
+			Err(UnionFindError::ElementNotDefined),
+			set.union(&b'Q', &b'Q')
+		);
 
 		assert_eq!(Ok(()), set.union(&b't', &b'i'));
 
 		set.define(&b'p').unwrap();
 		assert_eq!(Ok(()), set.union(&b't', &b'p'));
 
-		assert_eq!(Err(UnionFindError::ElementNotDefined), set.union(&b't', &b'Q'));
-		assert_eq!(Err(UnionFindError::ElementNotDefined), set.union(&b'Q', &b't'));
-		assert_eq!(Err(UnionFindError::ElementNotDefined), set.union(&b'Z', &b'Q'));
-		assert_eq!(Err(UnionFindError::ElementNotDefined), set.union(&b'Q', &b'Q'));
+		assert_eq!(
+			Err(UnionFindError::ElementNotDefined),
+			set.union(&b't', &b'Q')
+		);
+		assert_eq!(
+			Err(UnionFindError::ElementNotDefined),
+			set.union(&b'Q', &b't')
+		);
+		assert_eq!(
+			Err(UnionFindError::ElementNotDefined),
+			set.union(&b'Z', &b'Q')
+		);
+		assert_eq!(
+			Err(UnionFindError::ElementNotDefined),
+			set.union(&b'Q', &b'Q')
+		);
 	}
 
 	#[test]
@@ -164,14 +217,18 @@ mod tests {
 
 		let subset1 = set.subset_containing(&b'a').unwrap();
 		assert!(subset1.contains(&b'a'));
-		assert_eq!(Err(UnionFindError::ElementNotDefined), set.subset_containing(&b'Q'));
+		assert_eq!(
+			Err(UnionFindError::ElementNotDefined),
+			set.subset_containing(&b'Q')
+		);
 
 		set.union(&b'a', &b's').unwrap();
 		set.define(&b'Q').unwrap();
 		set.union(&b'Q', &b'e').unwrap();
 		set.union(&b'e', &b'a').unwrap();
 		let subset2 = set.subset_containing(&b'a').unwrap();
-		[&b'a', &b's', &b'Q', &b'e'].to_vec()
+		[&b'a', &b's', &b'Q', &b'e']
+			.to_vec()
 			.into_iter()
 			.for_each(|elem| assert!(subset2.contains(elem)));
 	}
@@ -232,7 +289,9 @@ mod tests {
 pub type Result<T> = result::Result<T, UnionFindError>;
 
 pub trait UnionFind<'a, T: 'a>
-	where Self: iter::FromIterator<&'a T> {
+where
+	Self: iter::FromIterator<&'a T>,
+{
 	fn define(&mut self, elem: &'a T) -> Result<()>;
 	fn union(&mut self, elem_a: &'a T, elem_b: &'a T) -> Result<()>;
 	fn find(&mut self, elem: &'a T) -> Result<SubsetTicket>;
@@ -255,7 +314,8 @@ impl fmt::Display for UnionFindError {
 			f,
 			"{}",
 			match self {
-				UnionFindError::ElementNotDefined => "The provided element is not defined in this set.",
+				UnionFindError::ElementNotDefined =>
+					"The provided element is not defined in this set.",
 				UnionFindError::DuplicateElement => "The element is already defined in this set.",
 			}
 		)
@@ -273,7 +333,11 @@ pub struct SubsetTicket {
 
 impl fmt::Debug for SubsetTicket {
 	fn fmt(&self, f: &mut fmt::Formatter<'_>) -> result::Result<(), fmt::Error> {
-		write!(f, "id: {}, version: {}, set: {:?}", self.id, self.ver, self.set_id)
+		write!(
+			f,
+			"id: {}, version: {}, set: {:?}",
+			self.id, self.ver, self.set_id
+		)
 	}
 }
 
