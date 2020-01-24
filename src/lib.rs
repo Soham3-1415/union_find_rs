@@ -290,13 +290,13 @@ pub type Result<T> = result::Result<T, UnionFindError>;
 
 pub trait UnionFind<'a, T: 'a>
 where
-	Self: iter::FromIterator<&'a T>,
+	Self: iter::FromIterator<&'a T> + Default,
 {
 	fn define(&mut self, elem: &'a T) -> Result<()>;
 	fn union(&mut self, elem_a: &'a T, elem_b: &'a T) -> Result<()>;
 	fn find(&mut self, elem: &'a T) -> Result<SubsetTicket>;
-	fn subset_containing(&mut self, elem: &'a T) -> Result<HashSet<&T>>;
-	fn all_subsets(&mut self) -> Vec<HashSet<&T>>;
+	fn subset_containing(&mut self, elem: &'a T) -> Result<HashSet<&'a T>>;
+	fn all_subsets(&mut self) -> Vec<HashSet<&'a T>>;
 	fn same_subset(&mut self, elem_a: &'a T, elem_b: &'a T) -> Result<bool>;
 	fn subset_count(&self) -> usize;
 	fn subset_size(&mut self, elem: &'a T) -> Result<usize>;

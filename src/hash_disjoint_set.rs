@@ -80,7 +80,7 @@ where
 		})
 	}
 
-	fn subset_containing(&mut self, elem: &T) -> Result<HashSet<&T>> {
+	fn subset_containing(&mut self, elem: &'a T) -> Result<HashSet<&'a T>> {
 		let i = self.index(elem)?;
 		let root = Self::find_internal(&mut self.set, i);
 		let avg_set_size = self.set.len() / self.subset_count;
@@ -97,7 +97,7 @@ where
 		Ok(subset)
 	}
 
-	fn all_subsets(&mut self) -> Vec<HashSet<&T>> {
+	fn all_subsets(&mut self) -> Vec<HashSet<&'a T>> {
 		let avg_set_size = self.set.len() / self.subset_count;
 		let mut subset_map = HashMap::with_capacity(self.subset_count);
 		let mut subsets = Vec::with_capacity(self.subset_count);
