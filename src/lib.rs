@@ -324,27 +324,9 @@ impl fmt::Display for UnionFindError {
 
 impl std::error::Error for UnionFindError {}
 
-#[derive(Eq, PartialEq)]
+#[derive(Debug, Hash, Eq, PartialEq)]
 pub struct SubsetTicket {
 	id: usize,
 	ver: usize,
 	set_id: usize,
-}
-
-impl fmt::Debug for SubsetTicket {
-	fn fmt(&self, f: &mut fmt::Formatter<'_>) -> result::Result<(), fmt::Error> {
-		write!(
-			f,
-			"id: {}, version: {}, set: {:?}",
-			self.id, self.ver, self.set_id
-		)
-	}
-}
-
-impl hash::Hash for SubsetTicket {
-	fn hash<H: hash::Hasher>(&self, state: &mut H) {
-		self.id.hash(state);
-		self.ver.hash(state);
-		self.set_id.hash(state);
-	}
 }
