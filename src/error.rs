@@ -1,8 +1,11 @@
 use std::fmt::{Display, Formatter, Result};
 
+/// Error type used by `hash_disjoint_set`
 #[derive(Debug, PartialEq)]
 pub enum HashDisjointSetError {
+	/// returned when a method tries to look for an element that does not exist in the set (any of the disjoint subsets).
 	ElementNotDefined,
+	/// returned when a method tries to add an element to the set, and the element is already defined in the set (any one of the disjoint subsets).
 	DuplicateElement,
 }
 

@@ -1,17 +1,20 @@
 use std::collections::hash_map::Entry;
 use std::collections::{HashMap, HashSet};
 use std::fmt::Debug;
+use std::marker::PhantomData;
 use std::sync::atomic::{AtomicUsize, Ordering};
 use std::{fmt, hash, iter, mem, result};
 
 pub use crate::error::HashDisjointSetError;
 use crate::{SubsetTicket, UnionFind};
-use std::marker::PhantomData;
 
 type Result<T> = result::Result<T, HashDisjointSetError>;
 
 static SET_ID: AtomicUsize = AtomicUsize::new(0);
 
+/// Uses a `HashMap` and `Vec` to do meet the requirements for the `UnionFind` trait.
+///
+/// Path splitting is used. The union operation is done by size.
 pub struct HashDisjointSet<'a, T>
 where
 	T: hash::Hash + Eq,
@@ -179,6 +182,36 @@ impl<'a, T> HashDisjointSet<'a, T>
 where
 	T: hash::Hash + Eq,
 {
+	/// Adds an element to the `HashDisjointSet`.
+	/// The added element is considered part of a new disjoint subset
+	/// containing only that element.
+	///
+	/// # Examples
+	///
+	/// ```
+	/// # use union_find::hash_disjoint_set::HashDisjointSet;
+	/// # use std::iter::FromIterator;
+	/// # use union_find::UnionFind;
+	/// #
+	/// let mut set = HashDisjointSet::from_iter(b"This is a test.");
+	/// let result = set.define(&b'Q').unwrap();
+	///
+	/// assert_eq!(result, ());
+	/// assert_eq!(10, set.subset_count());
+	/// ```
+	///
+	/// # Failures
+	/// An error is returned if the provided element is not in the set.
+	/// ```
+	/// # use union_find::hash_disjoint_set::{HashDisjointSet, HashDisjointSetError};
+	/// # use std::iter::FromIterator;
+	/// # use union_find::UnionFind;
+	/// #
+	/// let mut set = HashDisjointSet::from_iter(b"This is a test.");
+	/// let result = set.define(&b'T').unwrap_err();
+	///
+	/// assert_eq!(result, HashDisjointSetError::DuplicateElement);
+	/// ```
 	pub fn define(&mut self, elem: &'a T) -> Result<()> {
 		let set = &mut self.set;
 
@@ -221,6 +254,15 @@ impl<'a, T> HashDisjointSet<'a, T>
 where
 	T: hash::Hash + Eq + Debug,
 {
+	/// Pretty prints a `HashDisjointSet` for debugging purposes.
+	///
+	/// The order of each set in the list is arbitrary,
+	/// and the order of each element in the sets are also arbitrary.
+	///
+	/// The `Debug` trait cannot be used because
+	/// efficiently finding elements requires access to `&mut self`.
+	/// However, the method signature is the same is the method for `fmt(..)`
+	/// required by the `Debug` trait.
 	pub fn fmt(&mut self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
 		write!(f, "{:?}", self.all_subsets())
 	}
