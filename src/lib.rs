@@ -11,6 +11,7 @@ pub type Result<T> = result::Result<T, UnionFindError>;
 pub trait UnionFind<'a, T: 'a>
 where
 	Self: iter::FromIterator<&'a T>,
+	T: Hash + Eq,
 {
 	type UnionFindError: Error;
 
