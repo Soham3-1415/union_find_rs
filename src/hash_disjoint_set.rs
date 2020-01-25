@@ -194,7 +194,7 @@ where
 	/// # use union_find::UnionFind;
 	/// #
 	/// let mut set = HashDisjointSet::from_iter(b"This is a test.");
-	/// let result = set.define(&b'Q').unwrap();
+	/// let result = set.insert(&b'Q').unwrap();
 	///
 	/// assert_eq!(result, ());
 	/// assert_eq!(10, set.subset_count());
@@ -208,11 +208,11 @@ where
 	/// # use union_find::UnionFind;
 	/// #
 	/// let mut set = HashDisjointSet::from_iter(b"This is a test.");
-	/// let result = set.define(&b'T').unwrap_err();
+	/// let result = set.insert(&b'T').unwrap_err();
 	///
 	/// assert_eq!(result, HashDisjointSetError::DuplicateElement);
 	/// ```
-	pub fn define(&mut self, elem: &'a T) -> Result<()> {
+	pub fn insert(&mut self, elem: &'a T) -> Result<()> {
 		let set = &mut self.set;
 
 		if let Entry::Vacant(entry) = self.map.entry(elem) {

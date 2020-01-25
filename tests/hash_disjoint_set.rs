@@ -20,14 +20,14 @@ fn define_err() {
 	let mut set = HashDisjointSet::from_iter(b"This is a test.");
 	assert_eq!(
 		Err(HashDisjointSetError::DuplicateElement),
-		set.define(&b'T')
+		set.insert(&b'T')
 	);
 }
 
 #[test]
 fn define_ok() {
 	let mut set = HashDisjointSet::from_iter(b"This is a test.");
-	assert_eq!(Ok(()), set.define(&b'Q'));
+	assert_eq!(Ok(()), set.insert(&b'Q'));
 }
 
 #[test]
@@ -45,14 +45,14 @@ fn from_iter_subset_count() {
 #[test]
 fn define_ok_subset_count() {
 	let mut set = HashDisjointSet::from_iter(b"This is a test.");
-	set.define(&b'P').unwrap();
+	set.insert(&b'P').unwrap();
 	assert_eq!(10, set.subset_count());
 }
 
 #[test]
 fn define_err_subset_count() {
 	let mut set = HashDisjointSet::from_iter(b"This is a test.");
-	set.define(&b'h').unwrap_err();
+	set.insert(&b'h').unwrap_err();
 	assert_eq!(9, set.subset_count());
 }
 
@@ -87,16 +87,16 @@ fn no_op_subset_size() {
 }
 
 #[test]
-fn define_ok_subset_size() {
+fn insert_ok_subset_size() {
 	let mut set = HashDisjointSet::from_iter(b"This is a test.");
-	set.define(&b'P').unwrap();
+	set.insert(&b'P').unwrap();
 	assert_eq!(1, set.subset_size(&b'P').unwrap());
 }
 
 #[test]
-fn define_err_subset_size() {
+fn insert_err_subset_size() {
 	let mut set = HashDisjointSet::from_iter(b"This is a test.");
-	set.define(&b'h').unwrap_err();
+	set.insert(&b'h').unwrap_err();
 	assert_eq!(1, set.subset_size(&b'h').unwrap());
 }
 
@@ -153,11 +153,11 @@ fn different_set_find() {
 }
 
 #[test]
-fn different_ver_define_find() {
+fn different_ver_insert_find() {
 	let mut set = HashDisjointSet::from_iter(b"This is a test.");
 
 	let ticket1 = set.find(&b'T').unwrap();
-	set.define(&b'Q').unwrap();
+	set.insert(&b'Q').unwrap();
 	let ticket2 = set.find(&b'T').unwrap();
 
 	assert_ne!(ticket1, ticket2);
@@ -223,9 +223,9 @@ fn find_err() {
 }
 
 #[test]
-fn define_union() {
+fn insert_union() {
 	let mut set = HashDisjointSet::from_iter(b"This is a test.");
-	set.define(&b'Q').unwrap();
+	set.insert(&b'Q').unwrap();
 	assert_eq!(Ok(()), set.union(&b'Q', &b'T'));
 }
 
@@ -327,7 +327,7 @@ fn subset_containing() {
 	let mut set = HashDisjointSet::from_iter(b"This is a test.");
 
 	set.union(&b't', &b'T').unwrap();
-	set.define(&b'Q').unwrap();
+	set.insert(&b'Q').unwrap();
 	set.union(&b'Q', &b'e').unwrap();
 	set.union(&b'e', &b't').unwrap();
 
@@ -378,7 +378,7 @@ fn all_subsets() {
 	let mut set = HashDisjointSet::from_iter(b"This is a test.");
 
 	set.union(&b'a', &b's').unwrap();
-	set.define(&b'Q').unwrap();
+	set.insert(&b'Q').unwrap();
 	set.union(&b'Q', &b'e').unwrap();
 	set.union(&b'e', &b'a').unwrap();
 
