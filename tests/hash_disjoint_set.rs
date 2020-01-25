@@ -2,8 +2,8 @@ use std::collections::HashSet;
 use std::hash::Hash;
 use std::iter::FromIterator;
 
-use union_find::hash_disjoint_set::HashDisjointSet;
-use union_find::{SubsetTicket, UnionFind, UnionFindError};
+use union_find::hash_disjoint_set::{HashDisjointSet, HashDisjointSetError};
+use union_find::{SubsetTicket, UnionFind};
 
 #[test]
 fn create_from_iter() {
@@ -18,7 +18,10 @@ fn create_default() {
 #[test]
 fn define_err() {
 	let mut set = HashDisjointSet::from_iter(b"This is a test.");
-	assert_eq!(Err(UnionFindError::DuplicateElement), set.define(&b'T'));
+	assert_eq!(
+		Err(HashDisjointSetError::DuplicateElement),
+		set.define(&b'T')
+	);
 }
 
 #[test]
@@ -125,7 +128,7 @@ fn union_err_subset_size() {
 fn subset_size_err() {
 	let mut set = HashDisjointSet::from_iter(b"This is a test.");
 	assert_eq!(
-		Err(UnionFindError::ElementNotDefined),
+		Err(HashDisjointSetError::ElementNotDefined),
 		set.subset_size(&b'Q')
 	);
 }
@@ -178,7 +181,10 @@ fn path_compression_find() {
 #[test]
 fn find_err() {
 	let mut set = HashDisjointSet::from_iter(b"This is a test.");
-	assert_eq!(Err(UnionFindError::ElementNotDefined), set.find(&b'Q'));
+	assert_eq!(
+		Err(HashDisjointSetError::ElementNotDefined),
+		set.find(&b'Q')
+	);
 }
 
 #[test]
@@ -204,7 +210,7 @@ fn same_union_ok() {
 fn union_err_left() {
 	let mut set = HashDisjointSet::from_iter(b"This is a test.");
 	assert_eq!(
-		Err(UnionFindError::ElementNotDefined),
+		Err(HashDisjointSetError::ElementNotDefined),
 		set.union(&b'Q', &b'T'),
 	);
 }
@@ -213,7 +219,7 @@ fn union_err_left() {
 fn union_err_right() {
 	let mut set = HashDisjointSet::from_iter(b"This is a test.");
 	assert_eq!(
-		Err(UnionFindError::ElementNotDefined),
+		Err(HashDisjointSetError::ElementNotDefined),
 		set.union(&b'T', &b'Q'),
 	);
 }
@@ -222,7 +228,7 @@ fn union_err_right() {
 fn union_err_both() {
 	let mut set = HashDisjointSet::from_iter(b"This is a test.");
 	assert_eq!(
-		Err(UnionFindError::ElementNotDefined),
+		Err(HashDisjointSetError::ElementNotDefined),
 		set.union(&b'Q', &b'Q'),
 	);
 }
@@ -231,7 +237,7 @@ fn union_err_both() {
 fn same_subset_err_left() {
 	let mut set = HashDisjointSet::from_iter(b"This is a test.");
 	assert_eq!(
-		Err(UnionFindError::ElementNotDefined),
+		Err(HashDisjointSetError::ElementNotDefined),
 		set.same_subset(&b'Q', &b'T'),
 	);
 }
@@ -240,7 +246,7 @@ fn same_subset_err_left() {
 fn same_subset_err_right() {
 	let mut set = HashDisjointSet::from_iter(b"This is a test.");
 	assert_eq!(
-		Err(UnionFindError::ElementNotDefined),
+		Err(HashDisjointSetError::ElementNotDefined),
 		set.same_subset(&b'T', &b'Q'),
 	);
 }
@@ -249,7 +255,7 @@ fn same_subset_err_right() {
 fn same_subset_err_both() {
 	let mut set = HashDisjointSet::from_iter(b"This is a test.");
 	assert_eq!(
-		Err(UnionFindError::ElementNotDefined),
+		Err(HashDisjointSetError::ElementNotDefined),
 		set.same_subset(&b'Q', &b'Q'),
 	);
 }
@@ -305,7 +311,7 @@ fn subset_containing() {
 fn subset_containing_err() {
 	let mut set = HashDisjointSet::from_iter(b"This is a test.");
 	assert_eq!(
-		Err(UnionFindError::ElementNotDefined),
+		Err(HashDisjointSetError::ElementNotDefined),
 		set.subset_containing(&b'Q'),
 	);
 }

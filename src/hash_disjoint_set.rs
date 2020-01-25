@@ -1,10 +1,11 @@
 use std::collections::hash_map::Entry;
 use std::collections::{HashMap, HashSet};
 use std::sync::atomic::{AtomicUsize, Ordering};
-use std::{hash, iter, mem};
+use std::{fmt, hash, iter, mem, result};
 
-use crate::{Result, SubsetTicket, UnionFind, UnionFindError};
-
+pub use crate::error::HashDisjointSetError;
+use crate::{SubsetTicket, UnionFind};
+type Result<T> = result::Result<T, HashDisjointSetError>;
 static SET_ID: AtomicUsize = AtomicUsize::new(0);
 
 pub struct HashDisjointSet<'a, T>
@@ -27,25 +28,7 @@ impl<'a, T: 'a> UnionFind<'a, T> for HashDisjointSet<'a, T>
 where
 	T: hash::Hash + Eq,
 {
-	fn define(&mut self, elem: &'a T) -> Result<()> {
-		let set = &mut self.set;
-
-		if let Entry::Vacant(entry) = self.map.entry(elem) {
-			entry.insert(set.len());
-			Ok(())
-		} else {
-			Err(UnionFindError::DuplicateElement)
-		}?;
-
-		set.push(Unit {
-			size: 1,
-			parent: set.len(),
-		});
-		self.subset_count += 1;
-		self.ver += 1;
-
-		Ok(())
-	}
+	type UnionFindError = HashDisjointSetError;
 
 	fn union(&mut self, elem_a: &T, elem_b: &T) -> Result<()> {
 		let a_i = self.index(elem_a)?;
@@ -187,10 +170,30 @@ where
 	}
 }
 
-impl<T> HashDisjointSet<'_, T>
+impl<'a, T> HashDisjointSet<'a, T>
 where
 	T: hash::Hash + Eq,
 {
+	pub fn define(&mut self, elem: &'a T) -> Result<()> {
+		let set = &mut self.set;
+
+		if let Entry::Vacant(entry) = self.map.entry(elem) {
+			entry.insert(set.len());
+			Ok(())
+		} else {
+			Err(HashDisjointSetError::DuplicateElement)
+		}?;
+
+		set.push(Unit {
+			size: 1,
+			parent: set.len(),
+		});
+		self.subset_count += 1;
+		self.ver += 1;
+
+		Ok(())
+	}
+
 	fn find_internal(set: &mut Vec<Unit>, elem: usize) -> usize {
 		let mut elem = elem;
 		while set[elem].parent != elem {
@@ -205,6 +208,15 @@ where
 		Ok(*self
 			.map
 			.get(&elem)
-			.ok_or(UnionFindError::ElementNotDefined)?)
+			.ok_or(HashDisjointSetError::ElementNotDefined)?)
+	}
+}
+
+impl<T> fmt::Debug for HashDisjointSet<'_, T>
+where
+	T: hash::Hash + Eq,
+{
+	fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+		unimplemented!()
 	}
 }
