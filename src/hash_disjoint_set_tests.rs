@@ -2,8 +2,8 @@ use std::collections::HashSet;
 use std::hash::Hash;
 use std::iter::FromIterator;
 
-use union_find::hash_disjoint_set::{HashDisjointSet, HashDisjointSetError};
-use union_find::{SubsetTicket, UnionFind};
+use crate::hash_disjoint_set::{HashDisjointSet, HashDisjointSetError};
+use crate::{SubsetTicket, UnionFind};
 
 #[test]
 fn create_from_iter() {

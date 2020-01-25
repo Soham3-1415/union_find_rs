@@ -9,6 +9,9 @@ mod error;
 
 pub mod hash_disjoint_set;
 
+#[cfg(test)]
+mod hash_disjoint_set_tests;
+
 /// This trait should be applied to set structures
 /// that store disjoint subsets and can find information
 /// on the subsets based on provided elements.
