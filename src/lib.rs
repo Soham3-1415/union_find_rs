@@ -1,9 +1,5 @@
 //! This crate allows users to work with the union and find operations for disjoint sets.
-use std::collections::HashSet;
-use std::error::Error;
-use std::hash::Hash;
-use std::iter;
-use std::marker::PhantomData;
+use std::{collections::HashSet, error::Error, hash::Hash, iter, marker::PhantomData};
 
 mod error;
 
@@ -20,8 +16,7 @@ mod hash_disjoint_set_tests;
 pub trait UnionFind<'a, T: 'a>
 where
 	Self: iter::FromIterator<&'a T>,
-	T: Hash + Eq,
-{
+	T: Hash + Eq, {
 	/// Some error type is needed for all implementors
 	type UnionFindError: Error;
 
@@ -36,7 +31,7 @@ where
 	/// # use union_find::UnionFind;
 	/// #
 	/// let mut set = HashDisjointSet::from_iter(b"This is a test.");
-	/// let result = set.union(&b'T',&b't').unwrap();
+	/// let result = set.union(&b'T', &b't').unwrap();
 	///
 	/// assert_eq!((), result);
 	/// assert_eq!(8, set.subset_count());
@@ -48,7 +43,7 @@ where
 	/// # use union_find::UnionFind;
 	/// #
 	/// let mut set = HashDisjointSet::from_iter(b"This is a test.");
-	/// let result = set.union(&b'T',&b'T').unwrap();
+	/// let result = set.union(&b'T', &b'T').unwrap();
 	///
 	/// assert_eq!((), result);
 	/// assert_eq!(9, set.subset_count());
@@ -62,10 +57,10 @@ where
 	/// # use union_find::UnionFind;
 	/// #
 	/// let mut set = HashDisjointSet::from_iter(b"This is a test.");
-	/// let result = set.union(&b'T',&b'Q').unwrap_err();
+	/// let result = set.union(&b'T', &b'Q').unwrap_err();
 	///
 	/// assert_eq!(HashDisjointSetError::ElementNotDefined, result);
-	///```
+	/// ```
 	fn union(&mut self, elem_a: &'a T, elem_b: &'a T) -> Result<(), Self::UnionFindError>;
 
 	/// Identify the subset of an element.
@@ -158,7 +153,7 @@ where
 	/// # use union_find::UnionFind;
 	/// #
 	/// let mut set = HashDisjointSet::from_iter(b"This is a test.");
-	/// let result = set.same_subset(&b't',&b'a').unwrap();
+	/// let result = set.same_subset(&b't', &b'a').unwrap();
 	///
 	/// assert!(!result);
 	/// ```
@@ -171,7 +166,7 @@ where
 	/// # use union_find::UnionFind;
 	/// #
 	/// let mut set = HashDisjointSet::from_iter(b"This is a test.");
-	/// let result = set.same_subset(&b't',&b'Q').unwrap_err();
+	/// let result = set.same_subset(&b't', &b'Q').unwrap_err();
 	///
 	/// assert_eq!(HashDisjointSetError::ElementNotDefined, result);
 	/// ```

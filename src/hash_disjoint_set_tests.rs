@@ -1,19 +1,16 @@
-use std::collections::HashSet;
-use std::hash::Hash;
-use std::iter::FromIterator;
+use std::{collections::HashSet, hash::Hash, iter::FromIterator};
 
-use crate::hash_disjoint_set::{HashDisjointSet, HashDisjointSetError};
-use crate::{SubsetTicket, UnionFind};
-
-#[test]
-fn create_from_iter() {
-	HashDisjointSet::from_iter(b"This is a test.");
-}
+use crate::{
+	hash_disjoint_set::{HashDisjointSet, HashDisjointSetError},
+	SubsetTicket,
+	UnionFind,
+};
 
 #[test]
-fn create_default() {
-	HashDisjointSet::<u8>::default();
-}
+fn create_from_iter() { HashDisjointSet::from_iter(b"This is a test."); }
+
+#[test]
+fn create_default() { HashDisjointSet::<u8>::default(); }
 
 #[test]
 fn define_err() {
@@ -190,9 +187,7 @@ fn same_ver_union_find() {
 
 #[test]
 fn moved_set_find() {
-	fn move_set(mut set: HashDisjointSet<u8>) -> SubsetTicket<u8> {
-		set.find(&b'T').unwrap()
-	}
+	fn move_set(mut set: HashDisjointSet<u8>) -> SubsetTicket<u8> { set.find(&b'T').unwrap() }
 
 	let mut set = HashDisjointSet::from_iter(b"This is a test.");
 
@@ -400,12 +395,10 @@ fn all_subsets() {
 
 #[derive(Debug, Eq)]
 struct Subsets<'a, T>(&'a [HashSet<&'a T>])
-where
-	T: Hash + Eq;
+where T: Hash + Eq;
 
 impl<T> PartialEq for Subsets<'_, T>
-where
-	T: Hash + Eq,
+where T: Hash + Eq
 {
 	fn eq(&self, other: &Self) -> bool {
 		let expected_subsets = &self.0;

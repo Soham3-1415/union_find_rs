@@ -1,9 +1,14 @@
-use std::collections::hash_map::Entry;
-use std::collections::{HashMap, HashSet};
-use std::fmt::Debug;
-use std::marker::PhantomData;
-use std::sync::atomic::{AtomicUsize, Ordering};
-use std::{fmt, hash, iter, mem, result};
+use std::{
+	collections::{hash_map::Entry, HashMap, HashSet},
+	fmt,
+	fmt::Debug,
+	hash,
+	iter,
+	marker::PhantomData,
+	mem,
+	result,
+	sync::atomic::{AtomicUsize, Ordering},
+};
 
 pub use crate::error::HashDisjointSetError;
 use crate::{SubsetTicket, UnionFind};
@@ -16,9 +21,7 @@ static SET_ID: AtomicUsize = AtomicUsize::new(0);
 ///
 /// Path splitting is used. The union operation is done by size.
 pub struct HashDisjointSet<'a, T>
-where
-	T: hash::Hash + Eq,
-{
+where T: hash::Hash + Eq {
 	ver: usize,
 	map: HashMap<&'a T, usize>,
 	set: Vec<Unit>,
@@ -32,8 +35,7 @@ struct Unit {
 }
 
 impl<'a, T: 'a> UnionFind<'a, T> for HashDisjointSet<'a, T>
-where
-	T: hash::Hash + Eq,
+where T: hash::Hash + Eq
 {
 	type UnionFindError = HashDisjointSetError;
 
@@ -116,9 +118,7 @@ where
 		Ok(root_a == root_b)
 	}
 
-	fn subset_count(&self) -> usize {
-		self.subset_count
-	}
+	fn subset_count(&self) -> usize { self.subset_count }
 
 	fn subset_size(&mut self, elem: &T) -> Result<usize> {
 		let i = self.index(elem)?;
@@ -128,8 +128,7 @@ where
 }
 
 impl<'a, T> Default for HashDisjointSet<'_, T>
-where
-	T: hash::Hash + Eq,
+where T: hash::Hash + Eq
 {
 	fn default() -> Self {
 		let disjoint_set = HashDisjointSet {
@@ -145,13 +144,10 @@ where
 }
 
 impl<'a, T> iter::FromIterator<&'a T> for HashDisjointSet<'a, T>
-where
-	T: hash::Hash + Eq,
+where T: hash::Hash + Eq
 {
 	fn from_iter<I>(iter: I) -> Self
-	where
-		I: IntoIterator<Item = &'a T>,
-	{
+	where I: IntoIterator<Item = &'a T> {
 		let mut map = HashMap::new();
 		let mut set = Vec::new();
 
@@ -179,8 +175,7 @@ where
 }
 
 impl<'a, T> HashDisjointSet<'a, T>
-where
-	T: hash::Hash + Eq,
+where T: hash::Hash + Eq
 {
 	/// Adds an element to the `HashDisjointSet`.
 	/// The added element is considered part of a new disjoint subset
@@ -251,8 +246,7 @@ where
 }
 
 impl<'a, T> HashDisjointSet<'a, T>
-where
-	T: hash::Hash + Eq + Debug,
+where T: hash::Hash + Eq + Debug
 {
 	/// Pretty prints a `HashDisjointSet` for debugging purposes.
 	///
