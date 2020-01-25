@@ -6,6 +6,7 @@ use std::{fmt, hash, iter, mem, result};
 
 pub use crate::error::HashDisjointSetError;
 use crate::{SubsetTicket, UnionFind};
+use std::marker::PhantomData;
 
 type Result<T> = result::Result<T, HashDisjointSetError>;
 
@@ -55,7 +56,7 @@ where
 		Ok(())
 	}
 
-	fn find(&mut self, elem: &T) -> Result<SubsetTicket> {
+	fn find(&mut self, elem: &T) -> Result<SubsetTicket<T>> {
 		let i = self.index(elem)?;
 		let root = Self::find_internal(&mut self.set, i);
 
@@ -63,6 +64,7 @@ where
 			ver: self.ver,
 			id: root,
 			set_id: self.set_id,
+			phantom: PhantomData,
 		})
 	}
 

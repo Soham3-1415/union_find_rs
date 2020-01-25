@@ -190,7 +190,7 @@ fn same_ver_union_find() {
 
 #[test]
 fn moved_set_find() {
-	fn move_set(mut set: HashDisjointSet<u8>) -> SubsetTicket {
+	fn move_set(mut set: HashDisjointSet<u8>) -> SubsetTicket<u8> {
 		set.find(&b'T').unwrap()
 	}
 
