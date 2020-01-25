@@ -1,11 +1,14 @@
 use std::collections::hash_map::Entry;
 use std::collections::{HashMap, HashSet};
+use std::fmt::Debug;
 use std::sync::atomic::{AtomicUsize, Ordering};
 use std::{fmt, hash, iter, mem, result};
 
 pub use crate::error::HashDisjointSetError;
 use crate::{SubsetTicket, UnionFind};
+
 type Result<T> = result::Result<T, HashDisjointSetError>;
+
 static SET_ID: AtomicUsize = AtomicUsize::new(0);
 
 pub struct HashDisjointSet<'a, T>
@@ -212,11 +215,11 @@ where
 	}
 }
 
-impl<T> fmt::Debug for HashDisjointSet<'_, T>
+impl<'a, T> HashDisjointSet<'a, T>
 where
-	T: hash::Hash + Eq,
+	T: hash::Hash + Eq + Debug,
 {
-	fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-		unimplemented!()
+	pub fn fmt(&mut self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+		write!(f, "{:?}", self.all_subsets())
 	}
 }
