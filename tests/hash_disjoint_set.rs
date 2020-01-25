@@ -153,13 +153,48 @@ fn different_set_find() {
 }
 
 #[test]
+fn different_ver_define_find() {
+	let mut set = HashDisjointSet::from_iter(b"This is a test.");
+
+	let ticket1 = set.find(&b'T').unwrap();
+	set.define(&b'Q').unwrap();
+	let ticket2 = set.find(&b'T').unwrap();
+
+	assert_ne!(ticket1, ticket2);
+}
+
+#[test]
+fn different_ver_union_find() {
+	let mut set = HashDisjointSet::from_iter(b"This is a test.");
+
+	let ticket1 = set.find(&b'T').unwrap();
+	set.union(&b'T', &b't').unwrap();
+	let ticket2 = set.find(&b'T').unwrap();
+
+	assert_ne!(ticket1, ticket2);
+}
+
+#[test]
+fn same_ver_union_find() {
+	let mut set = HashDisjointSet::from_iter(b"This is a test.");
+
+	set.union(&b'T', &b's').unwrap();
+	set.union(&b'i', &b't').unwrap();
+	set.union(&b'i', &b's').unwrap();
+	let ticket1 = set.find(&b'T').unwrap();
+	set.union(&b'T', &b't').unwrap();
+	let ticket2 = set.find(&b'T').unwrap();
+
+	assert_eq!(ticket1, ticket2);
+}
+
+#[test]
 fn moved_set_find() {
 	fn move_set(mut set: HashDisjointSet<u8>) -> SubsetTicket {
-		set.find(&b't').unwrap()
+		set.find(&b'T').unwrap()
 	}
 
 	let mut set = HashDisjointSet::from_iter(b"This is a test.");
-	set.union(&b't', &b'T').unwrap();
 
 	let ticket1 = set.find(&b'T').unwrap();
 	let ticket2 = move_set(set);
