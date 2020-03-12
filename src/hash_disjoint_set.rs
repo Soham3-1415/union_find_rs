@@ -2,11 +2,9 @@ use std::{
 	collections::{hash_map::Entry, HashMap, HashSet},
 	fmt,
 	fmt::Debug,
-	hash,
-	iter,
+	hash, iter,
 	marker::PhantomData,
-	mem,
-	result,
+	mem, result,
 	sync::atomic::{AtomicUsize, Ordering},
 };
 
@@ -21,7 +19,9 @@ static SET_ID: AtomicUsize = AtomicUsize::new(0);
 ///
 /// Path splitting is used. The union operation is done by size.
 pub struct HashDisjointSet<'a, T>
-where T: hash::Hash + Eq {
+where
+	T: hash::Hash + Eq,
+{
 	ver: usize,
 	map: HashMap<&'a T, usize>,
 	set: Vec<Unit>,
@@ -35,7 +35,8 @@ struct Unit {
 }
 
 impl<'a, T: 'a> UnionFind<'a, T> for HashDisjointSet<'a, T>
-where T: hash::Hash + Eq
+where
+	T: hash::Hash + Eq,
 {
 	type UnionFindError = HashDisjointSetError;
 
@@ -118,7 +119,9 @@ where T: hash::Hash + Eq
 		Ok(root_a == root_b)
 	}
 
-	fn subset_count(&self) -> usize { self.subset_count }
+	fn subset_count(&self) -> usize {
+		self.subset_count
+	}
 
 	fn subset_size(&mut self, elem: &T) -> Result<usize> {
 		let i = self.index(elem)?;
@@ -128,7 +131,8 @@ where T: hash::Hash + Eq
 }
 
 impl<'a, T> Default for HashDisjointSet<'_, T>
-where T: hash::Hash + Eq
+where
+	T: hash::Hash + Eq,
 {
 	fn default() -> Self {
 		let disjoint_set = HashDisjointSet {
@@ -144,10 +148,13 @@ where T: hash::Hash + Eq
 }
 
 impl<'a, T> iter::FromIterator<&'a T> for HashDisjointSet<'a, T>
-where T: hash::Hash + Eq
+where
+	T: hash::Hash + Eq,
 {
 	fn from_iter<I>(iter: I) -> Self
-	where I: IntoIterator<Item = &'a T> {
+	where
+		I: IntoIterator<Item = &'a T>,
+	{
 		let mut map = HashMap::new();
 		let mut set = Vec::new();
 
@@ -175,7 +182,8 @@ where T: hash::Hash + Eq
 }
 
 impl<'a, T> HashDisjointSet<'a, T>
-where T: hash::Hash + Eq
+where
+	T: hash::Hash + Eq,
 {
 	/// Adds an element to the `HashDisjointSet`.
 	/// The added element is considered part of a new disjoint subset
@@ -246,7 +254,8 @@ where T: hash::Hash + Eq
 }
 
 impl<'a, T> HashDisjointSet<'a, T>
-where T: hash::Hash + Eq + Debug
+where
+	T: hash::Hash + Eq + Debug,
 {
 	/// Pretty prints a `HashDisjointSet` for debugging purposes.
 	///
@@ -255,8 +264,7 @@ where T: hash::Hash + Eq + Debug
 	///
 	/// The `Debug` trait cannot be used because
 	/// efficiently finding elements requires access to `&mut self`.
-	/// However, the method signature is the same is the method for `fmt(..)`
-	/// required by the `Debug` trait.
+	/// However, the method signature is similar to the method signature for `Debug::fmt(..)`.
 	pub fn fmt(&mut self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
 		write!(f, "{:?}", self.all_subsets())
 	}
